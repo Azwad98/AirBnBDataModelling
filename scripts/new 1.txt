@@ -1,0 +1,85 @@
+library(scatterplot3d)
+
+
+price<-training_data$price
+latitude<-training_data$latitude
+longitude<-training_data$longitude
+
+par(mar= c(5, 5, 2, 1) + 0.1)
+
+scatterplot3d(longitude,latitude, price, main="3D Scatter plot for Private Rooms")
+
+# Plot by Location divided in Neighbourhood groups
+
+plot(longitude,latitude,col=Private_room$neighbourhood_group, main = "Private Rooms")
+legend("topleft", legend=c("Brooklyn","Manhattan","Queens","Staten Island","Bronx") , pch= 1, col=c("Red","Green","Blue","Cyan","Black"))
+
+#------------------- Plots for Entire Home -------------------------#
+
+price<-training_data$price
+latitude<-training_data$latitude
+longitude<-training_data$longitude
+
+plot(longitude,latitude,col=Entire_home$neighbourhood_group, main = "Entire Homes")
+legend("topleft", legend=c("Brooklyn","Manhattan","Queens","Staten Island","Bronx") , pch= 1, col=c("Red","Green","Blue","Cyan","Black"))
+
+#------------------- Plots for Shared Rooms -------------------------#
+
+price<-training_data$price
+latitude<-training_data$latitude
+longitude<-training_data$longitude
+
+plot(longitude,latitude,col=Shared_room$neighbourhood_group, main = "Shared Rooms")
+legend("topleft", legend=c("Brooklyn","Manhattan","Queens","Staten Island","Bronx") , pch= 1, col=c("Red","Green","Blue","Cyan","Black"))
+
+
+# ----------------------Plot by room type---------------#
+
+price<-training_data$price
+latitude<-training_data$latitude
+longitude<-training_data$longitude
+
+plot(longitude,latitude,col=c(c(1,2,3),c(NYA_rand$room_type)), main = "Room Type", xlab = "Longitude", ylab = "Latitude")
+legend("topleft", legend=c("Entire Home","Private Rooms","Shared Rooms") , pch= 1, col=c("Red","Black","Green"))
+
+#------------------- Plots for Price -------------------------#
+
+price<-training_data$price
+latitude<-training_data$latitude
+longitude<-training_data$longitude
+
+plot(longitude,latitude,col=heat.colors(price), main = "Price")
+
+
+#-----------------------------Distribution Code----------------------#
+library("ggplot2")
+library(dplyr)
+
+airbnb_nh <- NYA_rand %>%
+  group_by(neighbourhood_group) %>%
+  summarise(price = round(mean(price), 2))
+
+p <- ggplot(NYA_rand, aes(price)) + 
+  geom_histogram(bins = 30, aes(y = ..density..), fill = "purple") + 
+  geom_density(alpha = 0.3, fill = "purple")  + 
+  ggtitle("Distribution of price by neighbourhood groups") +
+  geom_vline(data = airbnb_nh, aes(xintercept = price), size = 2, linetype = 3) +
+  geom_text(data = airbnb_nh,y = 1.5, aes(x = price + 1400, label = paste("Mean  = ",price)), color = "darkgreen", size = 4) +
+  facet_wrap(~neighbourhood_group)
+
+print(p)
+
+ps <- ggplot(NYA_rand, aes(price)) + 
+      geom_histogram(bins = 30, aes(y = ..density..), fill = "purple") + 
+      geom_density(alpha = 0.3, fill = "purple")  + 
+      ggtitle("Distribution of price by neighbourhood groups",
+          subtitle = expression("With" ~'log'[10] ~ "transformation of x-axis")) +
+      geom_vline(data = airbnb_nh, aes(xintercept = price), size = 2, linetype = 3) +
+      geom_text(data = airbnb_nh,y = 1.5, aes(x = price + 1400, label = paste("Mean  = ",price)), color = "darkgreen", size = 4) +
+      facet_wrap(~neighbourhood_group) + scale_x_log10() 
+  
+
+
+print(ps)
+
+
